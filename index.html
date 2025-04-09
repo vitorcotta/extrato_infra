@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Status dos Sistemas</title>
+  <style>
+    .top-bar {
+    background-color: #333; /* Cor da barra */
+    padding: 5px 0;
+    text-align: center;
+}
+
+.top-bar a {
+    color: white;
+    font-size: 12px; /* Fonte pequena */
+    text-decoration: none;
+    margin: 0 10px; /* Espaço entre os links */
+}
+
+.top-bar a:hover {
+    text-decoration: underline;
+}
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      overflow-x: hidden;
+    }
+    h1 {
+      text-align: center;
+    }
+    table {
+      width: 1300px; /* Aumentei a largura da tabela para acomodar as novas colunas */
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin:auto;
+    }
+    th, td {
+      padding: 2px;
+      border: 1px solid #ddd;
+      text-align: center;
+      word-wrap: break-word;
+    }
+    .status {
+      width: 40px;
+    }
+    th {
+      background-color: #f4f4f4;
+      cursor: pointer;
+    }
+    .ok {
+      background-color: #02b902;
+      color: #ffffff;
+      cursor: pointer;
+    }
+    .indisponivel {
+      background-color: #fb2c39;
+      color: #ffffff;
+      cursor: pointer;
+    }
+    .degradado {
+      background-color: #fb632c;
+      color: #ffffff;
+      cursor: pointer;
+    }
+    .informacao {
+      background-color: #2196f3;
+      color: #ffffff;
+      cursor: pointer;
+    }
+    .timeline-container {
+      display: flex;
+      margin: 1px 0;
+      overflow-x: auto;
+      align-items: center;
+      position: relative;
+      /*height: 20px;*/
+    }
+    .timeline-block {
+      width: 5px;
+      height: 25px;
+      margin-right: 1px;
+  
+    }
+    .green {
+      background-color: #02b902;
+    }
+    .orange {
+      background-color: #fb632c;
+    }
+    .red {
+      background-color: #fb2c39;
+    }
+    .blue {
+      background-color: #2196f3;
+    }
+    .sidebar {
+      position: fixed;
+      top: 0;
+      height: 100%;
+      width: 400px;
+      background-color: #fff;
+      box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+      overflow-y: auto;
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+    .timeline-sidebar {
+      right: -400px;
+    }
+    .details-sidebar {
+      right: -800px;
+    }
+    .timeline-sidebar.open {
+      right: 0;
+    }
+    .details-sidebar.open {
+      right: 400px;
+    }
+    .sidebar-header {
+      padding: 15px;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #ddd;
+    }
+    .sidebar-header h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    #timelineContent {
+      list-style-type: none;
+      margin: 0;
+      padding: 20px;
+    }
+    .timeline-item {
+      margin: 5px 0;
+      padding: 5px;
+      border-left: 8px solid;
+      position: relative;
+      cursor: pointer;
+    }
+    #eventDetails {
+      padding: 20px;
+    }
+    .critical {
+      border-left-color: #fb2c39;
+    }
+    .warning {
+      border-left-color: #fb632c;
+    }
+    .information {
+      border-left-color: #2196f3;
+    }
+  </style>
+</head>
+<body>
+  <nav class="top-bar">
+    <a href="/status/logistica/">Logística</a>
+    <a href="/status/passageiros/">Passageiros</a>
+    <a href="/status/comercio/">Comércio</a>
+</nav>
+  <h1>Status dos Sistemas</h1>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 200px;" onclick="sortTable(0)">Sistema</th>
+        <th style="width: 50px;" onclick="sortTable(1)">Status</th>
+        <th style="width: 80px;" onclick="sortTable(2)">Incidentes</th>
+        <th style="width: 90px;" onclick="sortTable(3)">Indisponível</th>
+        <th style="width: 85px;" onclick="sortTable(4)">Degradado</th>
+        <th style="width: 110px;" onclick="sortTable(5)">Disponibilidade</th>
+        <th style="width: 250px;">Timeline (últimos 30 dias)</th>
+      </tr>
+    </thead>
+    <tbody id="statusTable">
+      <!-- Dados serão carregados aqui -->
+    </tbody>
+  </table>
+
+  <!-- Timeline Sidebar -->
+  <div id="timelineSidebar" class="sidebar timeline-sidebar">
+    <div class="sidebar-header">
+      <h2 id="timelineTitle">Timeline</h2>
+      <button class="close-btn" onclick="closeSidebar('timelineSidebar');closeSidebar('detailsSidebar')">×</button>
+    </div>
+    <ul id="timelineContent">
+      <!-- Timeline será carregada aqui -->
+    </ul>
+  </div>
+
+  <!-- Event Details Sidebar -->
+  <div id="detailsSidebar" class="sidebar details-sidebar">
+    <div class="sidebar-header">
+      <h2>Detalhes do Evento</h2>
+      <button class="close-btn" onclick="closeSidebar('detailsSidebar')">×</button>
+    </div>
+    <div id="eventDetails">
+      <!-- Detalhes do evento serão carregados aqui -->
+    </div>
+  </div>
+
+  <script>
+    const startDate = new Date('2025-01-01T00:00:00'); // Data base para cálculo da disponibilidade
+
+    async function fetchData() {
+      const response = await fetch('data.json?v=' + Date.now());
+      const timelineResponse = await fetch('timeline2.json?v=' + Date.now());
+      const eventsResponse = await fetch('events.json?v=' + Date.now());
+      const data = await response.json();
+      const timelines = await timelineResponse.json();
+      const events = await eventsResponse.json();
+      const tableBody = document.getElementById('statusTable');
+
+      tableBody.innerHTML = ''; // Limpa a tabela
+
+      data.forEach((item, index) => {
+        const row = document.createElement('tr');
+        let statusText = 'OK';
+        let statusClass = 'ok';
+
+        if (item.incidente) {
+          if (item.tipo === 'INDISPONÍVEL') {
+            statusText = 'Indisponível';
+            statusClass = 'indisponivel';
+          } else if (item.tipo === 'DEGRADADO') {
+            statusText = 'Degradado';
+            statusClass = 'degradado';
+          } else if (item.tipo === 'INFORMAÇÃO') {
+            statusText = 'Informação';
+            statusClass = 'informacao';
+          }
+
+          if (item.status === "Contornado") {
+            statusText = `Contornado (${formatDate(new Date(item.Contorno))})`;
+          }
+        }
+
+        // Calcula os valores para as novas colunas
+        const sistemaEvents = events.filter(event => event.Sistema === item.sistema);
+        const incidentCount = sistemaEvents.length;
+        const unavailableTime = calculateTotalTime(sistemaEvents, 'INDISPONÍVEL');
+        const degradedTime = calculateTotalTime(sistemaEvents, 'DEGRADADO');
+        const availability = calculateAvailability(sistemaEvents);
+
+        // Timeline Horizontal
+        const timelineData = timelines[index]?.timeline || [];
+        const timelineDiv = document.createElement('div');
+        timelineDiv.classList.add('timeline-container');
+
+        timelineData.forEach(block => {
+          const div = document.createElement('div');
+          div.classList.add('timeline-block', block);
+          timelineDiv.appendChild(div);
+        });
+
+        row.innerHTML = `
+          <td onclick="showTimeline('${item.sistema}');closeSidebar('detailsSidebar')">${item.sistema}</td>
+          <td style="text-align: center; vertical-align: middle;" onclick="showTimeline('${item.sistema}');closeSidebar('detailsSidebar')">
+            <img src="${getStatusIcon(statusClass)}" alt="${statusClass}" style="width: 24px; height: 24px;">
+          </td>
+          <td onclick="showTimeline('${item.sistema}');closeSidebar('detailsSidebar')">${incidentCount}</td>
+          <td onclick="showTimeline('${item.sistema}');closeSidebar('detailsSidebar')">${unavailableTime} min</td>
+          <td onclick="showTimeline('${item.sistema}');closeSidebar('detailsSidebar')">${degradedTime} min</td>
+          <td onclick="showTimeline('${item.sistema}');closeSidebar('detailsSidebar')">${availability}%</td>
+        `;
+        const timelineCell = document.createElement('td');
+        timelineCell.appendChild(timelineDiv);
+        row.appendChild(timelineCell);
+
+        tableBody.appendChild(row);
+      });
+
+      sortTable(0);
+    }
+
+    function sortTable(columnIndex) {
+      const table = document.getElementById('statusTable');
+      const rows = Array.from(table.querySelectorAll('tr'));
+
+      rows.sort((a, b) => {
+        const aValue = a.cells[columnIndex].textContent.trim();
+        const bValue = b.cells[columnIndex].textContent.trim();
+
+        if (columnIndex === 2 || columnIndex === 3 || columnIndex === 4 || columnIndex === 5) {
+          // Ordenação numérica para colunas de números
+          return parseFloat(aValue) - parseFloat(bValue);
+        } else {
+          // Ordenação alfabética para outras colunas
+          return aValue.localeCompare(bValue);
+        }
+      });
+
+      // Limpa a tabela e adiciona as linhas ordenadas
+      table.innerHTML = '';
+      rows.forEach(row => table.appendChild(row));
+    }
+
+    function calculateTotalTime(events, type) {
+      let totalTime = 0;
+      events.forEach(event => {
+        if (event.Tipo === type) {
+          const inicio = convertExcelDate(event.Inicio);
+          const contorno = event.Contorno ? convertExcelDate(event.Contorno) : new Date();
+          const fim = event.Fim ? convertExcelDate(event.Fim) : new Date();
+
+          if (contorno < fim) {
+            const diffInMs = contorno - inicio;
+            const diffInMinutes = diffInMs / (1000 * 60);
+            totalTime += diffInMinutes;
+          } else {
+            const diffInMs = fim - inicio;
+            const diffInMinutes = diffInMs / (1000 * 60);
+            totalTime += diffInMinutes;
+          }
+        }
+      });
+      return Math.round(totalTime);
+    }
+
+    function calculateAvailability(events) {
+      const totalTime = new Date() - startDate;
+      let unavailableTime = 0;
+
+      events.forEach(event => {
+        if (event.Tipo === 'INDISPONÍVEL' || event.Tipo === 'DEGRADADO') {
+          const inicio = convertExcelDate(event.Inicio);
+          const fim = event.Fim ? convertExcelDate(event.Fim) : new Date();
+          const contorno = event.Contorno ? convertExcelDate(event.Contorno) : new Date();
+          if (contorno < fim){
+            unavailableTime += (contorno - inicio);
+          } else {
+            unavailableTime += (fim - inicio);
+          }
+        }
+      });
+
+      const availability = ((totalTime - unavailableTime) / totalTime) * 100;
+      return availability.toFixed(2);
+    }
+
+    async function showTimeline(sistema) {
+      const timelineSidebar = document.getElementById('timelineSidebar');
+      const timelineContent = document.getElementById('timelineContent');
+      const timelineTitle = document.getElementById('timelineTitle');
+
+      timelineTitle.textContent = `Timeline: ${sistema}`;
+      timelineContent.innerHTML = ''; // Limpa o conteúdo anterior
+
+      const response = await fetch('events.json?v=' + Date.now());
+      const events = await response.json();
+      const filteredEvents = events.filter(event => event.Sistema === sistema);
+
+      if (filteredEvents.length === 0) {
+        timelineContent.innerHTML = '<li>Nenhum evento encontrado para este sistema.</li>';
+      } else {
+        filteredEvents.forEach(event => {
+          const inicio = convertExcelDate(event.Inicio);
+          const fim = event.Fim ? convertExcelDate(event.Fim) : null;
+          const contorno = event.Contorno ? convertExcelDate(event.Contorno) : null;
+          const duration = calculateDuration(inicio, contorno || fim);
+
+          const item = document.createElement('li');
+          item.classList.add(
+            'timeline-item',
+            event.Tipo === 'INDISPONÍVEL' ? 'critical' : 
+            event.Tipo === 'DEGRADADO' ? 'warning' : 
+            'information'
+          );
+          item.innerHTML = `
+            <strong>Início:</strong> ${formatDate(inicio)}<br>
+            ${contorno ? `<strong>Contorno:</strong> ${formatDate(contorno)}<br>` : ''}
+            ${fim ? `<strong>Fim:</strong> ${formatDate(fim)}<br>` : ''}
+            <strong>Tempo:</strong> ${duration}<br>
+          `;
+          item.onclick = () => showEventDetails(event);
+          timelineContent.appendChild(item);
+        });
+      }
+
+      timelineSidebar.classList.add('open');
+    }
+
+    function showEventDetails(event) {
+      const detailsSidebar = document.getElementById('detailsSidebar');
+      const eventDetails = document.getElementById('eventDetails');
+
+      const inicio = convertExcelDate(event.Inicio);
+      const fim = event.Fim ? convertExcelDate(event.Fim) : null;
+      const contorno = event.Contorno ? convertExcelDate(event.Contorno) : null;
+
+      eventDetails.innerHTML = `
+        <p><strong>Sistema:</strong> ${event.Sistema}</p>
+        <p><strong>Tipo:</strong> ${event.Tipo}</p>
+        <p><strong>Início:</strong> ${formatDate(inicio)}</p>
+        ${contorno ? `<p><strong>Contorno:</strong> ${formatDate(contorno)}</p>` : ''}
+        ${fim ? `<p><strong>Fim:</strong> ${formatDate(fim)}</p>` : ''}
+        <p><strong>Sintoma:</strong> ${event['Sintoma'] || 'N/A'}</p>
+        <p><strong>Diagnóstico Inicial:</strong> ${event['Diagnóstico Inicial'] || 'N/A'}</p>
+        <p><strong>Ação Contorno:</strong> ${event['Ação Contorno'] || 'N/A'}</p>
+        <p><strong>Causa Raiz:</strong> ${event['Causa Raiz'] || 'N/A'}</p>
+        <p><strong>Status:</strong> ${event.Status}</p>
+      `;
+
+      detailsSidebar.classList.add('open');
+    }
+
+    function closeSidebar(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    function convertExcelDate(dateString) {
+      if (!dateString) return null;
+
+      const [datePart, timePart] = dateString.split(' ');
+      const [day, month, year] = datePart.split('/');
+      const [hours, minutes, seconds] = timePart.split(':');
+
+      return new Date(year, month - 1, day, hours, minutes, seconds);
+    }
+
+    function formatDate(date) {
+      if (!date) return 'N/A';
+      return date.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+    }
+
+    function calculateDuration(start, end) {
+      if (!start || !end) return 'Em andamento';
+      const durationMs = end - start;
+      const hours = Math.floor(durationMs / (1000 * 60 * 60));
+      const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+      return `${hours}h ${minutes}min`;
+    }
+
+    function getStatusIcon(statusClass) {
+      switch (statusClass) {
+        case 'ok':
+          return 'icon/check.png';
+        case 'degradado':
+          return 'icon/caution.png';
+        case 'indisponivel':
+          return 'icon/alert.png';
+        case 'informacao':
+          return 'icon/information.png';
+        default:
+          return 'icon/default.png';
+      }
+    }
+
+    fetchData();
+  </script>
+</body>
+</html>
