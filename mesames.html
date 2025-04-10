@@ -108,8 +108,8 @@
           const getStatusClass = (value) => {
             if (!value) return '';
             const num = parseFloat(value);
-            if (num === 100) return 'ok';
-            if (num >= 99) return 'degradado';
+            if (num >= 99.9) return 'ok';
+            if (num < 99.9) return 'indisponivel';
             return 'indisponivel';
           };
 
