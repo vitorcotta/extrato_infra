@@ -1,0 +1,408 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <style>
+            /* Estilos globais */
+            body {
+                font-family: Arial, sans-serif;
+                background: #f4f4f4;
+                margin: 0;
+                padding: 20px;
+            }
+
+            .dashboard {
+                max-width: 900px;
+                margin: auto;
+                background: white;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            }
+
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background: #ebebeb;
+                color: black;
+                padding: 15px;
+                border-radius: 10px;
+                margin-bottom: 15px;
+                flex-wrap: wrap;
+            }
+
+            .header img {
+                height: 50px;
+            }
+
+            .header h1 {
+                margin: 0;
+                font-size: 1.5em;
+                white-space: nowrap;
+            }
+
+            .card {
+                background: white;
+                border-radius: 8px;
+                padding: 10px 20px;
+                margin-top: 15px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+
+            .icon {
+                margin-right: 10px;
+                font-size: 1.2em;
+            }
+
+            .variação {
+                font-size: 0.8em;
+                margin-left: 5px;
+                display: inline-flex;
+                align-items: center;
+                gap: 2px;
+            }
+
+            .up {
+                color: green;
+            }
+
+            .down {
+                color: red;
+            }
+
+            .availability-card {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+                flex-wrap: wrap;
+            }
+
+            .availability-metric {
+                background: #2e7d32;
+                color: white;
+                padding: 0px;
+                border-radius: 8px;
+                text-align: center;
+                flex: 1;
+                min-width: 120px;
+            }
+
+            .availability-value {
+                font-size: 2em;
+                font-weight: bold;
+                margin: 0;
+                padding-top: 0px;
+            }
+
+            .metrics {
+                display: flex;
+                gap: 15px;
+                flex-wrap: wrap;
+            }
+
+            .metric {
+                background: white;
+                padding: 15px;
+                border-radius: 8px;
+                text-align: center;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                min-width: 120px;
+                border-left: 4px solid;
+            }
+
+            .trend.up {
+                color: #2e7d32;
+            }
+
+            .trend.up.main {
+                color: white;
+            }
+
+            .trend.down {
+                color: #d32f2f;
+            }
+
+            .project-metric {
+                flex: 1;
+                min-width: 120px;
+                padding: 15px;
+                border-radius: 8px;
+                background: white;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                border-left: 4px solid transparent;
+            }
+
+            .project-metric h4 {
+                margin: 0 0 10px 0;
+                font-size: 1.1em;
+            }
+
+            .count {
+                font-size: 1.8em;
+                font-weight: bold;
+                margin: 5px 0;
+                text-align: center;
+            }
+
+            .investment {
+                color: #666;
+                margin: 5px 0;
+                font-size: 0.9em;
+            }
+
+            .resource-metric {
+                flex: 1;
+                min-width: 120px;
+                padding: 0px 15px;
+                border-radius: 8px;
+                background: white;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                border-left: 4px solid;
+            }
+
+            .text-blue {
+                color: #1976d2;
+                font-weight: bold;
+                font-size: 1.4em;
+                margin: 8px 0;
+            }
+
+            .text-purple {
+                color: purple;
+                font-weight: bold;
+                font-size: 1.4em;
+                margin: 8px 0;
+            }
+
+            .text-green {
+                color: green;
+                font-weight: bold;
+                font-size: 1.4em;
+                margin: 8px 0;
+            }
+
+            .resource-value {
+                font-size: 1.8em;
+                font-weight: bold;
+                margin: 5px 0;
+            }
+
+            .metric-card {
+                flex: 1;
+                min-width: 120px;
+                padding: 15px;
+                border-radius: 8px;
+                background: white;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                border-left: 4px solid #2e7d32;
+            }
+
+            .card-green {
+                border-color: #2e7d32;
+            }
+
+            .card-blue {
+                border-color: #1976d2;
+            }
+
+            .card-yellow {
+                border-color: #fbc02d;
+            }
+
+            .card-red {
+                border-color: #d32f2f;
+            }
+
+            .card-purple {
+                border-color: purple;
+            }
+
+            /* Media Queries para Responsividade */
+            @media (max-width: 768px) {
+                .header {
+                    flex-direction: column;
+                    text-align: center;
+                }
+
+                .header h1 {
+                    margin-top: 10px;
+                }
+
+                .availability-card, .metrics {
+                    flex-direction: column;
+                }
+
+                .availability-metric, .metric, .project-metric, .resource-metric {
+                    width: 100%;
+                    margin-bottom: 15px;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .header h1 {
+                    font-size: 1.2em;
+                }
+
+                .availability-value, .resource-value, .count {
+                    font-size: 1.5em;
+                }
+
+                .text-blue, .text-purple, .text-green {
+                    font-size: 1.2em;
+                }
+            }
+                .top-bar {
+      background-color: #333;
+      padding: 5px 0;
+      text-align: center;
+    }
+    
+    .top-bar a {
+      color: white;
+      font-size: 12px;
+      text-decoration: none;
+      margin: 0 10px;
+    }
+        </style>
+    </head>
+    <body>
+      <nav class="top-bar">
+        <a href="extrato.html">Extrato</a>
+        <a href="index.html">2025</a>
+        <a href="mesames.html">Mensal</a>
+    </nav>
+        <div class="dashboard">
+            <div class="header"> 
+                <img src="https://gab.com.br/css/img/grupo-aguia-branca.svg" alt="Grupo Águia Branca">
+                <h1>
+                    <i class="fas fa-server icon"></i> 
+                    EXTRATO INFRA E PRODUÇÃO
+                </h1>
+                <div>
+                    <h2>PASSAGEIROS</h2>
+                    <h3>Mês: Mar-25</h3>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>
+                    <i class="fas fa-circle-up icon"></i>
+                    Disponibilidade Sistemas
+                </h3>
+                <div class="availability-card">
+                    <div class="availability-metric">
+                        <h2>Disponibilidade Geral</h2>
+                        <p class="availability-value">100.0 %</p>
+                        <p class="trend up main">+0.004%</p>
+                    </div>
+                    <div class="metrics">
+                        <div class="metric card-blue">
+                            <h3>Sistemas</h3>
+                            <p>
+                                31
+                                <span class="variação up">
+                                    <i class="fas fa-arrow-up"></i>
+                                    0.0%
+                                </span>
+                            </p>
+                        </div>
+                        <div class="metric card-yellow">
+                            <h3>Eventos</h3>
+                            <p>
+                                0
+                                <span class="variação down">
+                                    <i class="fas fa-arrow-down"></i>
+                                    -100.0%
+                                </span>
+                            </p>
+                        </div>
+                        <div class="metric card-red">
+                            <h3>Tempo Indisponível</h3>
+                            <p>
+                                0 min
+                                <span class="variação down">
+                                    <i class="fas fa-arrow-down"></i>
+                                    -100.0%
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-cloud icon"></i>IaaS</h3>
+                <div class="metrics">
+                    <div class="resource-metric card-blue">
+                        <h3><i class="fas fa-desktop icon"></i>VMs Ativas</h3>
+                        <p class="text-blue">VMs Ativas: 93 <span class="variação down"><i class="fas fa-arrow-down"></i> -4.1%</span></p>
+                        <p>vCPU: 674 <span class="variação down"><i class="fas fa-arrow-down"></i> -3.7%</span></p>
+                        <p>Memória: 2354 <span class="variação down"><i class="fas fa-arrow-down"></i> -1.5%</span></p>
+                        <p>Storage: 43068 <span class="variação up"><i class="fas fa-arrow-up"></i> 1.4%</span></p>
+                    </div>
+                    <div class="resource-metric card-purple">
+                        <h3><i class="fas fa-cubes icon"></i> Kubernetes/Openshift</h3>
+                        <p class="text-purple">PODs: 17 <span class="variação up"><i class="fas fa-arrow-up"></i> 13.3%</span></p>
+                        <p>vCPU: 1 <span class="variação down"><i class="fas fa-arrow-down"></i> -66.7%</span></p>
+                        <p>Memória: 2273 <span class="variação down"><i class="fas fa-arrow-down"></i> -8.5%</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h3><i class="fas fa-database icon"></i> Bancos de Dados</h3>
+                <div class="metrics">
+                    <div class="resource-metric card-blue">
+                        <h3><i class="fas fa-database icon"></i>Oracle</h3>
+                        <p class="text-blue">Bases: 5 <span class="variação up"><i class="fas fa-arrow-up"></i> 0.0%</span></p>
+                        <p>vCPU: 5 <span class="variação down"><i class="fas fa-arrow-down"></i> -16.7%</span></p>
+                        <p>Memória: 141 <span class="variação up"><i class="fas fa-arrow-up"></i> 0.0%</span></p>
+                        <p>Storage: 12634 <span class="variação up"><i class="fas fa-arrow-up"></i> 2.2%</span></p>
+                    </div>
+                    <div class="resource-metric card-purple">
+                        <h3><i class="fas fa-database icon"></i>MSSQL</h3>
+                        <p class="text-purple">Bases: 15 <span class="variação up"><i class="fas fa-arrow-up"></i> 0.0%</span></p>
+                        <p>vCPU: 15 <span class="variação up"><i class="fas fa-arrow-up"></i> 0.0%</span></p>
+                        <p>Memória: 1081 <span class="variação down"><i class="fas fa-arrow-down"></i> -3.4%</span></p>
+                        <p>Storage: 7417 <span class="variação up"><i class="fas fa-arrow-up"></i> 3.5%</span></p>
+                    </div>
+                    <div class="resource-metric card-green">
+                        <h3><i class="fas fa-database icon"></i>MongoDB</h3>
+                        <p class="text-green">Bases: 2 <span class="variação up"><i class="fas fa-arrow-up"></i> 0.0%</span></p>
+                        <p>vCPU: 1 <span class="variação up"><i class="fas fa-arrow-up"></i> 0.0%</span></p>
+                        <p>Memória: 5 <span class="variação up"><i class="fas fa-arrow-up"></i> 0.0%</span></p>
+                        <p>Storage: 0.25 <span class="variação up"><i class="fas fa-arrow-up"></i> 25.0%</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h3><i class="fas fa-tasks icon"></i> Status de Projetos</h3>
+                <div class="metrics">
+                    <div class="project-metric card-blue">
+                <h4>Encerrados</h4>
+                <p class="count">0</p>
+                <p class="investment">R$ 0</p>
+            </div>
+            <div class="project-metric card-purple">
+                <h4>Em Andamento</h4>
+                <p class="count">2</p>
+                <p class="investment">R$ 63.888</p>
+            </div>
+            <div class="project-metric card-green">
+                <h4>Novo/Estudo</h4>
+                <p class="count">0</p>
+                <p class="investment">R$ 0</p>
+            </div>
+            <div class="project-metric card-red">
+                <h4>Pausados</h4>
+                <p class="count">0</p>
+                <p class="investment">R$ 0</p>
+            </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
