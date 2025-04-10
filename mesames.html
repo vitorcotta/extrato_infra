@@ -62,12 +62,10 @@
   </style>
 </head>
 <body>
-  <nav class="top-bar">
-    <a href="/status/logistica/">Logística</a>
-    <a href="/status/passageiros/">Passageiros</a>
-    <a href="/status/comercio/">Comércio</a>
-  </nav>
-
+    <nav class="top-bar">
+        <a href="index.html">2025</a>
+        <a href="mesames.html">Mensal</a>
+    </nav>
   <h1>Disponibilidade Mensal por Sistema</h1>
   
   <div class="table-container">
@@ -116,6 +114,7 @@
           };
 
           row.innerHTML = `
+
             <td>${item.sistema}</td>
             ${['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'].map(month => `
               <td class="${getStatusClass(item[month])}">
