@@ -74,7 +74,6 @@
     <table id="disponibilidadeTable">
       <thead>
         <tr>
-          <th>Divisão</th>
           <th>Sistema</th>
           <th>Jan</th>
           <th>Fev</th>
@@ -117,7 +116,6 @@
           };
 
           row.innerHTML = `
-            <td>${item.divisao}</td>
             <td>${item.sistema}</td>
             ${['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'].map(month => `
               <td class="${getStatusClass(item[month])}">
