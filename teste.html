@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitor de Sistemas</title>
+  <style>
+    /* Estilos combinados */
+    .top-bar {
+      background-color: #333;
+      padding: 5px 0;
+      text-align: center;
+    }
+    
+    .top-bar a {
+      color: white;
+      font-size: 12px;
+      text-decoration: none;
+      margin: 0 10px;
+      cursor: pointer;
+    }
+
+    .view-container {
+      display: none;
+    }
+
+    .view-active {
+      display: block;
+    }
+
+    /* Estilos da visão anual */
+    .status-table {
+      width: 1300px;
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin: auto;
+    }
+
+    .status-table th, .status-table td {
+      padding: 2px;
+      border: 1px solid #ddd;
+      text-align: center;
+      word-wrap: break-word;
+    }
+
+    .status-table th {
+      background-color: #f4f4f4;
+      cursor: pointer;
+    }
+
+    /* Estilos da visão mensal */
+    .monthly-table {
+      border-collapse: collapse;
+      margin: 20px auto;
+      min-width: 1000px;
+    }
+
+    .monthly-table th, .monthly-table td {
+      padding: 8px;
+      border: 1px solid #ddd;
+      text-align: center;
+      min-width: 80px;
+    }
+
+    /* Estilos comuns */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .table-container {
+      max-width: 100%;
+      overflow-x: auto;
+    }
+
+    /* Cores de status */
+    .ok { background-color: #02b902; color: white; }
+    .indisponivel { background-color: #fb2c39; color: white; }
+    .degradado { background-color: #fb632c; color: white; }
+    .informacao { background-color: #2196f3; color: white; }
+
+    /* Sidebars */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      height: 100%;
+      width: 400px;
+      background-color: #fff;
+      box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+      overflow-y: auto;
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      right: -400px;
+    }
+
+    .sidebar.open {
+      right: 0;
+    }
+
+    .sidebar-header {
+      padding: 15px;
+      background-color: #f4f4f4;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .timeline-item {
+      margin: 5px 0;
+      padding: 5px;
+      border-left: 8px solid;
+      cursor: pointer;
+    }
+
+    .critical { border-left-color: #fb2c39; }
+    .warning { border-left-color: #fb632c; }
+    .information { border-left-color: #2196f3; }
+  </style>
+</head>
+<body>
+  <nav class="top-bar">
+    <a onclick="showView('anual')">2025</a>
+    <a onclick="showView('mensal')">Mensal</a>
+  </nav>
+
+  <!-- Visão Anual -->
+  <div id="anualView" class="view-container view-active">
+    <h1>Status dos Sistemas</h1>
+    <table class="status-table">
+      <thead>
+        <tr>
+          <th style="width: 200px;">Sistema</th>
+          <th style="width: 50px;">Status</th>
+          <th style="width: 80px;">Incidentes</th>
+          <th style="width: 90px;">Indisponível</th>
+          <th style="width: 85px;">Degradado</th>
+          <th style="width: 110px;">Disponibilidade</th>
+          <th style="width: 250px;">Timeline (últimos 30 dias)</th>
+        </tr>
+      </thead>
+      <tbody id="statusTable"></tbody>
+    </table>
+
+    <!-- Sidebars -->
+    <div id="timelineSidebar" class="sidebar">
+      <div class="sidebar-header">
+        <h2>Timeline</h2>
+        <button class="close-btn" onclick="closeSidebar('timelineSidebar')">×</button>
+      </div>
+      <ul id="timelineContent"></ul>
+    </div>
+
+    <div id="detailsSidebar" class="sidebar">
+      <div class="sidebar-header">
+        <h2>Detalhes do Evento</h2>
+        <button class="close-btn" onclick="closeSidebar('detailsSidebar')">×</button>
+      </div>
+      <div id="eventDetails"></div>
+    </div>
+  </div>
+
+  <!-- Visão Mensal -->
+  <div id="mensalView" class="view-container">
+    <h1>Disponibilidade Mensal por Sistema</h1>
+    <div class="table-container">
+      <table class="monthly-table">
+        <thead>
+          <tr>
+            <th>Sistema</th>
+            <th>Jan</th>
+            <th>Fev</th>
+            <th>Mar</th>
+            <th>Abr</th>
+            <th>Mai</th>
+            <th>Jun</th>
+            <th>Jul</th>
+            <th>Ago</th>
+            <th>Set</th>
+            <th>Out</th>
+            <th>Nov</th>
+            <th>Dez</th>
+          </tr>
+        </thead>
+        <tbody id="monthlyData"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Controle de Views
+    function showView(viewName) {
+      document.querySelectorAll('.view-container').forEach(view => {
+        view.classList.remove('view-active');
+      });
+      document.getElementById(`${viewName}View`).classList.add('view-active');
+      
+      if(viewName === 'mensal' && !window.mensalLoaded) {
+        loadMensalData();
+        window.mensalLoaded = true;
+      }
+    }
+
+    // Funções da visão anual
+    const startDate = new Date('2025-01-01T00:00:00');
+
+    async function fetchData() {
+      const [dataRes, timelineRes, eventsRes] = await Promise.all([
+        fetch('data.json?v=' + Date.now()),
+        fetch('timeline2.json?v=' + Date.now()),
+        fetch('events.json?v=' + Date.now())
+      ]);
+      
+      const [data, timelines, events] = await Promise.all([
+        dataRes.json(),
+        timelineRes.json(),
+        eventsRes.json()
+      ]);
+
+      renderAnnualView(data, timelines, events);
+    }
+
+    function renderAnnualView(data, timelines, events) {
+      const tbody = document.getElementById('statusTable');
+      tbody.innerHTML = '';
+
+      data.forEach((item, index) => {
+        const row = document.createElement('tr');
+        // ... (mantenha a lógica original de renderização da tabela anual)
+        tbody.appendChild(row);
+      });
+    }
+
+    // Funções da visão mensal
+    async function loadMensalData() {
+      const response = await fetch('dispm2m.json');
+      const data = await response.json();
+      renderMonthlyView(data);
+    }
+
+    function renderMonthlyView(data) {
+      const tbody = document.getElementById('monthlyData');
+      tbody.innerHTML = '';
+
+      data.forEach(item => {
+        const row = document.createElement('tr');
+        // ... (mantenha a lógica original de renderização da tabela mensal)
+        tbody.appendChild(row);
+      });
+    }
+
+    // Funções compartilhadas
+    function closeSidebar(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    // Inicialização
+    window.mensalLoaded = false;
+    window.onload = fetchData;
+  </script>
+</body>
+</html>
