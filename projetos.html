@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projetos</title>
+  <style>
+    .top-bar {
+      background-color: #333;
+      padding: 5px 0;
+      text-align: center;
+    }
+    .top-bar a {
+      color: white;
+      font-size: 12px;
+      text-decoration: none;
+      margin: 0 10px;
+    }
+    .top-bar a:hover {
+      text-decoration: underline;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      overflow-x: hidden;
+    }
+    h1 {
+      text-align: center;
+    }
+    table {
+      width: 1000px;
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin: auto;
+    }
+    th, td {
+      padding: 6px;
+      border: 1px solid #ddd;
+      text-align: center;
+      word-wrap: break-word;
+    }
+    th {
+      background-color: #f4f4f4;
+      cursor: pointer;
+    }
+    .em-andamento {
+      background-color: #2196f3;
+      color: #fff;
+    }
+    .concluido {
+      background-color: #02b902;
+      color: #fff;
+    }
+    .atrasado {
+      background-color: #fb2c39;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <nav class="top-bar">
+    <a href="extrato.html">Extrato</a>
+    <a href="index.html">2025</a>
+    <a href="mesames.html">Mensal</a>
+  </nav>
+
+  <h1>Projetos em Andamento</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th onclick="sortTable(0)">Projeto</th>
+        <th onclick="sortTable(1)">Responsável</th>
+        <th onclick="sortTable(2)">Início</th>
+        <th onclick="sortTable(3)">Previsão de Fim</th>
+        <th onclick="sortTable(4)">Status</th>
+      </tr>
+    </thead>
+    <tbody id="projectTable">
+      <!-- Dados dos projetos vão aqui -->
+    </tbody>
+  </table>
+
+  <script>
+    async function fetchProjects() {
+      try {
+        const response = await fetch('projetos.json?v=' + Date.now());
+        const projetos = await response.json();
+        const tableBody = document.getElementById('projectTable');
+        tableBody.innerHTML = '';
+
+        projetos.forEach(projeto => {
+          const row = document.createElement('tr');
+          const statusClass = getStatusClass(projeto.status);
+
+          row.innerHTML = `
+            <td>${projeto.nome}</td>
+            <td>${projeto.responsavel}</td>
+            <td>${projeto.inicio}</td>
+            <td>${projeto.fim}</td>
+            <td class="${statusClass}">${projeto.status}</td>
+          `;
+          tableBody.appendChild(row);
+        });
+      } catch (error) {
+        console.error('Erro ao carregar projetos:', error);
+      }
+    }
+
+    function getStatusClass(status) {
+      switch (status.toLowerCase()) {
+        case 'em andamento': return 'em-andamento';
+        case 'concluído': return 'concluido';
+        case 'atrasado': return 'atrasado';
+        default: return '';
+      }
+    }
+
+    function sortTable(columnIndex) {
+      const table = document.getElementById('projectTable');
+      const rows = Array.from(table.querySelectorAll('tr'));
+
+      rows.sort((a, b) => {
+        const aValue = a.cells[columnIndex].textContent.trim();
+        const bValue = b.cells[columnIndex].textContent.trim();
+
+        if (columnIndex === 2 || columnIndex === 3) {
+          // Ordenar datas
+          return new Date(aValue) - new Date(bValue);
+        } else {
+          return aValue.localeCompare(bValue);
+        }
+      });
+
+      table.innerHTML = '';
+      rows.forEach(row => table.appendChild(row));
+    }
+
+    fetchProjects();
+  </script>
+</body>
+</html>
