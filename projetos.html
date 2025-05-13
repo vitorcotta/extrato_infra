@@ -63,18 +63,61 @@
       font-size: 0.95em;
     }
 
-    .top-bar {
-      background-color: #333;
-      padding: 5px 0;
-      text-align: center;
-    }
-    
-    .top-bar a {
-      color: white;
-      font-size: 12px;
-      text-decoration: none;
-      margin: 0 10px;
-    }
+  /* Estilo base da top-bar (mantém o seu) */
+.top-bar {
+  background-color: #333;
+  padding: 5px 0;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* Estilo dos links */
+.top-bar a, .dropbtn {
+  color: white;
+  font-size: 12px;
+  text-decoration: none;
+  margin: 0 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Dropdown container */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Conteúdo do dropdown */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #444;
+  min-width: 120px;
+  z-index: 1;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Links dentro do dropdown */
+.dropdown-content a {
+  color: white;
+  padding: 8px 12px;
+  display: block;
+  text-align: left;
+  text-decoration: none;
+}
+
+/* Hover sobre link do dropdown */
+.dropdown-content a:hover {
+  background-color: #555;
+}
+
+/* Mostrar dropdown ao passar o mouse */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
   </style>
 </head>
 
