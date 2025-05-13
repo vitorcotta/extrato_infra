@@ -81,9 +81,10 @@
             const div = document.createElement('div');
             div.className = 'project-metric';
             div.innerHTML = `
-              <h4>${proj.divisao}</h4>
+              <h4>${proj.status_1__1}</h4>
               <p class="count">${proj.qtd} projeto(s)</p>
-              <p class="investment">Investimento: R$ ${Number(proj.custo || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</p>
+              <p class="investment">Area solicitante:${proj.texto9__1}</p>
+              <p class="investment">Investimento: R$ ${Number(proj.numbers || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</p>
             `;
             metrics.appendChild(div);
           });
