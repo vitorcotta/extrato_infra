@@ -19,13 +19,13 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     .resource-metric {
-                flex: 1;
-                min-width: 400px;
-                padding: 0px 15px;
-                border-radius: 8px;
-                background: white;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                border-left: 4px solid;
+      flex: 1;
+      min-width: 400px;
+      padding: 0px 15px;
+      border-radius: 8px;
+      background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      border-left: 4px solid;
             }
     .card {
       background: white;
@@ -77,10 +77,18 @@
     }
   </style>
 </head>
+
 <nav class="top-bar">
   <a href="extrato.html">Extrato</a>
-  <a href="index.html">2025</a>
-  <a href="mesames.html">Mensal</a>
+
+  <div class="dropdown">
+    <button class="dropbtn">Disponibilidade ▾</button>
+    <div class="dropdown-content">
+      <a href="index.html">2025</a>
+      <a href="mesames.html">Mensal</a>
+    </div>
+  </div>
+  <a href="projetos.html">Projetos</a>
 </nav>
 <body>
 <div class="dashboard">
