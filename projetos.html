@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Dashboard de Projetos</title>
+  <title>Projetos por Status</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     body {
@@ -22,7 +22,7 @@
     }
     .metrics {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap: 15px;
       margin-top: 15px;
     }
@@ -30,19 +30,14 @@
       border-radius: 12px;
       padding: 15px;
       color: #333;
+      background-color: #e0f0ff;
     }
-    .card-yellow { background-color: #fff8dc; }
-    .card-blue   { background-color: #e0f0ff; }
-    .card-green  { background-color: #d4f4e4; }
-    .card-red    { background-color: #ffe4e1; }
-    .card-purple { background-color: #ede3f2; }
-
     .project-metric h4 {
       margin: 0 0 10px;
-      font-size: 1.2em;
+      font-size: 1.1em;
     }
     .count {
-      font-size: 1.1em;
+      font-size: 1.5em;
       font-weight: bold;
       margin-bottom: 5px;
     }
@@ -58,90 +53,47 @@
   <div id="projetosContainer"></div>
 
   <script>
-    const projetos = [
-      {
-        name: "Sistema de Vendas",
-        investimento: 120000,
-        divisao: "Comércio",
-        areaSolicitante: "Marketing",
-        status: "Em Análise"
-      },
-      {
-        name: "App Cliente",
-        investimento: 90000,
-        divisao: "Serviços",
-        areaSolicitante: "TI",
-        status: "Aprovado"
-      },
-      {
-        name: "Plataforma Logística",
-        investimento: 240000,
-        divisao: "Distribuição",
-        areaSolicitante: "Operações",
-        status: "Concluído"
-      },
-      {
-        name: "Sistema Interno",
-        investimento: 50000,
-        divisao: "Administrativo",
-        areaSolicitante: "RH",
-        status: "Cancelado"
-      },
-      {
-        name: "Chatbot IA",
-        investimento: 150000,
-        divisao: "Inovação",
-        areaSolicitante: "CX",
-        status: "Aprovado"
+    async function carregarProjetos() {
+      try {
+        const response = await fetch('projetos.json');
+        const projetos = await response.json();
+
+        const container = document.getElementById('projetosContainer');
+
+        // Agrupa por status
+        const porStatus = {};
+        projetos.forEach(p => {
+          if (!porStatus[p.status]) porStatus[p.status] = [];
+          porStatus[p.status].push(p);
+        });
+
+        // Cria os cards
+        Object.entries(porStatus).forEach(([status, lista]) => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `<h3><i class="fas fa-tasks icon"></i> ${status}</h3><div class="metrics"></div>`;
+          const metrics = card.querySelector('.metrics');
+
+          lista.forEach(proj => {
+            const div = document.createElement('div');
+            div.className = 'project-metric';
+            div.innerHTML = `
+              <h4>${proj.divisao}</h4>
+              <p class="count">${proj.qtd} projeto(s)</p>
+              <p class="investment">Investimento: R$ ${proj.custo.toLocaleString("pt-BR", {minimumFractionDigits: 2})}</p>
+            `;
+            metrics.appendChild(div);
+          });
+
+          container.appendChild(card);
+        });
+
+      } catch (e) {
+        console.error("Erro ao carregar projetos.json", e);
       }
-    ];
-
-    const statusColorMap = {
-      "Em Análise": "card-yellow",
-      "Aprovado": "card-blue",
-      "Concluído": "card-green",
-      "Cancelado": "card-red"
-    };
-
-    const container = document.getElementById("projetosContainer");
-
-    const projetosPorStatus = projetos.reduce((acc, projeto) => {
-      const status = projeto.status;
-      if (!acc[status]) acc[status] = [];
-      acc[status].push(projeto);
-      return acc;
-    }, {});
-
-    for (const [status, lista] of Object.entries(projetosPorStatus)) {
-      const statusCard = document.createElement("div");
-      statusCard.classList.add("card");
-
-      statusCard.innerHTML = `
-        <h3><i class="fas fa-tasks icon"></i> ${status}</h3>
-        <div class="metrics"></div>
-      `;
-
-      const metricsContainer = statusCard.querySelector(".metrics");
-
-      lista.forEach(projeto => {
-        const projetoDiv = document.createElement("div");
-        const cardClass = statusColorMap[projeto.status] || "card-purple";
-
-        projetoDiv.className = `project-metric ${cardClass}`;
-
-        projetoDiv.innerHTML = `
-          <h4>${projeto.name}</h4>
-          <p class="count">R$ ${parseFloat(projeto.investimento).toLocaleString("pt-BR")}</p>
-          <p class="investment">Divisão: ${projeto.divisao}</p>
-          <p class="investment">Área: ${projeto.areaSolicitante}</p>
-        `;
-
-        metricsContainer.appendChild(projetoDiv);
-      });
-
-      container.appendChild(statusCard);
     }
-  </script>
 
+    carregarProjetos();
+  </script>
 </body>
 </html>
