@@ -94,10 +94,10 @@
           const statusClass = getStatusClass(projeto.status);
 
           row.innerHTML = `
-            <td>${projeto.nome}</td>
-            <td>${projeto.responsavel}</td>
-            <td>${projeto.inicio}</td>
-            <td>${projeto.fim}</td>
+            <td>${projeto.divisao}</td>
+            <td>${projeto.name}</td>
+            <td>${projeto.areaSolicitante}</td>
+            <td>${projeto.investimento}</td>
             <td class="${statusClass}">${projeto.status}</td>
           `;
           tableBody.appendChild(row);
