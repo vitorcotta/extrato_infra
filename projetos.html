@@ -1,142 +1,147 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portifólio de Projetos</title>
+  <meta charset="UTF-8" />
+  <title>Dashboard de Projetos</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    .top-bar {
-      background-color: #333;
-      padding: 5px 0;
-      text-align: center;
-    }
-    .top-bar a {
-      color: white;
-      font-size: 12px;
-      text-decoration: none;
-      margin: 0 10px;
-    }
-    .top-bar a:hover {
-      text-decoration: underline;
-    }
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
-      overflow-x: hidden;
+      background: #f5f5f5;
     }
-    h1 {
-      text-align: center;
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    table {
-      width: 1000px;
-      border-collapse: collapse;
-      table-layout: fixed;
-      margin: auto;
+    .card h3 {
+      margin-top: 0;
     }
-    th, td {
-      padding: 6px;
-      border: 1px solid #ddd;
-      text-align: center;
-      word-wrap: break-word;
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
     }
-    th {
-      background-color: #f4f4f4;
-      cursor: pointer;
+    .project-metric {
+      border-radius: 12px;
+      padding: 15px;
+      color: #333;
     }
-    .em-andamento {
-      background-color: #2196f3;
-      color: #fff;
+    .card-yellow { background-color: #fff8dc; }
+    .card-blue   { background-color: #e0f0ff; }
+    .card-green  { background-color: #d4f4e4; }
+    .card-red    { background-color: #ffe4e1; }
+    .card-purple { background-color: #ede3f2; }
+
+    .project-metric h4 {
+      margin: 0 0 10px;
+      font-size: 1.2em;
     }
-    .concluido {
-      background-color: #02b902;
-      color: #fff;
+    .count {
+      font-size: 1.1em;
+      font-weight: bold;
+      margin-bottom: 5px;
     }
-    .atrasado {
-      background-color: #fb2c39;
-      color: #fff;
+    .investment {
+      margin: 0;
+      font-size: 0.95em;
     }
   </style>
 </head>
 <body>
-  <nav class="top-bar">
-    <a href="extrato.html">Extrato</a>
-    <a href="index.html">2025</a>
-    <a href="mesames.html">Mensal</a>
-  </nav>
 
-  <h1>Projetos em Andamento</h1>
-
-  <table>
-    <thead>
-      <tr>
-        <th onclick="sortTable(0)">Projeto</th>
-        <th onclick="sortTable(1)">Responsável</th>
-        <th onclick="sortTable(2)">Início</th>
-        <th onclick="sortTable(3)">Previsão de Fim</th>
-        <th onclick="sortTable(4)">Status</th>
-      </tr>
-    </thead>
-    <tbody id="projectTable">
-      <!-- Dados dos projetos vão aqui -->
-    </tbody>
-  </table>
+  <h2><i class="fas fa-diagram-project"></i> Projetos por Status</h2>
+  <div id="projetosContainer"></div>
 
   <script>
-    async function fetchProjects() {
-      try {
-        const response = await fetch('projetos.json?v=' + Date.now());
-        const projetos = await response.json();
-        const tableBody = document.getElementById('projectTable');
-        tableBody.innerHTML = '';
-
-        projetos.forEach(projeto => {
-          const row = document.createElement('tr');
-          const statusClass = getStatusClass(projeto.status);
-
-          row.innerHTML = `
-            <td>${projeto.divisao}</td>
-            <td>${projeto.name}</td>
-            <td>${projeto.areaSolicitante}</td>
-            <td>${projeto.investimento}</td>
-            <td class="${statusClass}">${projeto.status}</td>
-          `;
-          tableBody.appendChild(row);
-        });
-      } catch (error) {
-        console.error('Erro ao carregar projetos:', error);
+    const projetos = [
+      {
+        name: "Sistema de Vendas",
+        investimento: 120000,
+        divisao: "Comércio",
+        areaSolicitante: "Marketing",
+        status: "Em Análise"
+      },
+      {
+        name: "App Cliente",
+        investimento: 90000,
+        divisao: "Serviços",
+        areaSolicitante: "TI",
+        status: "Aprovado"
+      },
+      {
+        name: "Plataforma Logística",
+        investimento: 240000,
+        divisao: "Distribuição",
+        areaSolicitante: "Operações",
+        status: "Concluído"
+      },
+      {
+        name: "Sistema Interno",
+        investimento: 50000,
+        divisao: "Administrativo",
+        areaSolicitante: "RH",
+        status: "Cancelado"
+      },
+      {
+        name: "Chatbot IA",
+        investimento: 150000,
+        divisao: "Inovação",
+        areaSolicitante: "CX",
+        status: "Aprovado"
       }
-    }
+    ];
 
-    function getStatusClass(status) {
-      switch (status.toLowerCase()) {
-        case 'em andamento': return 'em-andamento';
-        case 'concluído': return 'concluido';
-        case 'atrasado': return 'atrasado';
-        default: return '';
-      }
-    }
+    const statusColorMap = {
+      "Em Análise": "card-yellow",
+      "Aprovado": "card-blue",
+      "Concluído": "card-green",
+      "Cancelado": "card-red"
+    };
 
-    function sortTable(columnIndex) {
-      const table = document.getElementById('projectTable');
-      const rows = Array.from(table.querySelectorAll('tr'));
+    const container = document.getElementById("projetosContainer");
 
-      rows.sort((a, b) => {
-        const aValue = a.cells[columnIndex].textContent.trim();
-        const bValue = b.cells[columnIndex].textContent.trim();
+    const projetosPorStatus = projetos.reduce((acc, projeto) => {
+      const status = projeto.status;
+      if (!acc[status]) acc[status] = [];
+      acc[status].push(projeto);
+      return acc;
+    }, {});
 
-        if (columnIndex === 2 || columnIndex === 3) {
-          // Ordenar datas
-          return new Date(aValue) - new Date(bValue);
-        } else {
-          return aValue.localeCompare(bValue);
-        }
+    for (const [status, lista] of Object.entries(projetosPorStatus)) {
+      const statusCard = document.createElement("div");
+      statusCard.classList.add("card");
+
+      statusCard.innerHTML = `
+        <h3><i class="fas fa-tasks icon"></i> ${status}</h3>
+        <div class="metrics"></div>
+      `;
+
+      const metricsContainer = statusCard.querySelector(".metrics");
+
+      lista.forEach(projeto => {
+        const projetoDiv = document.createElement("div");
+        const cardClass = statusColorMap[projeto.status] || "card-purple";
+
+        projetoDiv.className = `project-metric ${cardClass}`;
+
+        projetoDiv.innerHTML = `
+          <h4>${projeto.name}</h4>
+          <p class="count">R$ ${parseFloat(projeto.investimento).toLocaleString("pt-BR")}</p>
+          <p class="investment">Divisão: ${projeto.divisao}</p>
+          <p class="investment">Área: ${projeto.areaSolicitante}</p>
+        `;
+
+        metricsContainer.appendChild(projetoDiv);
       });
 
-      table.innerHTML = '';
-      rows.forEach(row => table.appendChild(row));
+      container.appendChild(statusCard);
     }
-
-    fetchProjects();
   </script>
+
 </body>
 </html>
