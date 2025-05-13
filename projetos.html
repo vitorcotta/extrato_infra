@@ -82,8 +82,7 @@
             div.className = 'project-metric';
             div.innerHTML = `
               <h4>${proj.name}</h4>
-              <p class="count">${proj.qtd} projeto(s)</p>
-              <p class="investment">Area solicitante:${proj.areaSolicitante}</p>
+              <p class="investment">Solicitante: ${proj.areaSolicitante}</p>
               <p class="investment">Investimento: R$ ${Number(proj.investimento || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</p>
             `;
             metrics.appendChild(div);
