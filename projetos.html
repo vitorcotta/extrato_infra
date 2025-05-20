@@ -1,191 +1,29 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Projetos por Status</title>
+  <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background: #f5f5f5;
-    }
-    .dashboard {
-      max-width: 900px;
-      margin: auto;
-      background: white;
-      padding: 20px;  
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    .resource-metric {
-      flex: 1;
-      min-width: 400px;
-      padding: 0px 15px;
-      border-radius: 8px;
-      background: white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      border-left: 4px solid;
-            }
-    .card {
-      background: white;
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .card h3 {
-      margin-top: 0;
-    }
-    .metrics {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      gap: 15px;
-      margin-top: 15px;
-    }
-    .project-metric {
-      border-radius: 12px;
-      padding: 15px;
-      color: #333;
-      background-color: #e0f0ff;
-    }
-    .project-metric h4 {
-      margin: 0 0 10px;
-      font-size: 1.1em;
-    }
-    .count {
-      font-size: 1.5em;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-    .investment {
-      margin: 0;
-      font-size: 0.95em;
-    }
-
-  /* Estilo base da top-bar (mantém o seu) */
-.top-bar {
-  background-color: #333;
-  padding: 5px 0;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  align-items: center;
-}
-
-/* Estilo dos links */
-.top-bar a, .dropbtn {
-  color: white;
-  font-size: 12px;
-  text-decoration: none;
-  margin: 0 10px;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-/* Dropdown container */
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-/* Conteúdo do dropdown */
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #444;
-  min-width: 120px;
-  z-index: 1;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-}
-
-/* Links dentro do dropdown */
-.dropdown-content a {
-  color: white;
-  padding: 8px 12px;
-  display: block;
-  text-align: left;
-  text-decoration: none;
-}
-
-/* Hover sobre link do dropdown */
-.dropdown-content a:hover {
-  background-color: #555;
-}
-
-/* Mostrar dropdown ao passar o mouse */
-.dropdown:hover .dropdown-content {
-  display: block;
-}
-  </style>
 </head>
-
-<nav class="top-bar">
-  <a href="extrato.html">Extrato</a>
-
-  <div class="dropdown">
-    <button class="dropbtn">Disponibilidade ▾</button>
-    <div class="dropdown-content">
-      <a href="index.html">Acumulada (Ano)</a>
-      <a href="mesames.html">Mês a mês</a>
-    </div>
-  </div>
-  <a href="projetos.html">Projetos</a>
-</nav>
 <body>
-<div class="dashboard">
-  <h2><i class="fas fa-diagram-project"></i> Projetos</h2>
-  <div id="projetosContainer">Carregando...</div>
+  <nav class="top-bar">
+    <a href="extrato.html">Extrato</a>
+    <div class="dropdown">
+      <button class="dropbtn">Disponibilidade ▾</button>
+      <div class="dropdown-content">
+        <a href="index.html">Acumulada (Ano)</a>
+        <a href="mesames.html">Mês a mês</a>
+      </div>
+    </div>
+    <a href="projetos.html">Projetos</a>
+  </nav>
 
-  <script>
-    async function carregarProjetos() {
-      const container = document.getElementById('projetosContainer');
-      container.innerHTML = '';
-
-      try {
-        const response = await fetch('projetos.json');
-        if (!response.ok) {
-          throw new Error('Arquivo projetos.json não encontrado.');
-        }
-
-        const projetos = await response.json();
-
-        const porStatus = {};
-        projetos.forEach(p => {
-          if (!porStatus[p.status]) porStatus[p.status] = [];
-          porStatus[p.status].push(p);
-        });
-
-        Object.entries(porStatus).forEach(([status, lista]) => {
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = `<h3><i class="fas fa-tasks icon"></i> ${status}</h3><div class="metrics"></div>`;
-          const metrics = card.querySelector('.metrics');
-
-          lista.forEach(proj => {
-            const div = document.createElement('div');
-            div.className = 'resource-metric';
-            div.innerHTML = `
-              <h4>${proj.name}</h4>
-              <p class="investment">Solicitante: ${proj.areaSolicitante}</p>
-              <p class="investment">Investimento: R$ ${Number(proj.investimento || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</p>
-            `;
-            metrics.appendChild(div);
-          });
-
-          container.appendChild(card);
-        });
-
-      } catch (e) {
-        console.error("Erro ao carregar projetos:", e);
-        container.innerHTML = `<p style="color: red;">Erro ao carregar dados: ${e.message}</p>`;
-      }
-    }
-
-    carregarProjetos();
-  </script>
+  <div class="dashboard">
+    <h2><i class="fas fa-diagram-project"></i> Projetos</h2>
+    <div id="projetosContainer">Carregando...</div>
   </div>
+
+  <script src="js/main.js"></script>
 </body>
 </html>
