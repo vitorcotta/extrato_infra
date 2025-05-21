@@ -216,6 +216,26 @@ body {
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   }
   
+  .card-green {
+    border-color: #2e7d32;
+  }
+  
+  .card-blue {
+    border-color: #1976d2;
+  }
+  
+  .card-yellow {
+    border-color: #fbc02d;
+  }
+  
+  .card-red {
+    border-color: #d32f2f;
+  }
+  
+  .card-purple {
+    border-color: purple;
+  }
+
   .metrics {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
