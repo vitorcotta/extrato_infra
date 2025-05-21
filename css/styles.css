@@ -387,6 +387,10 @@ th {
     font-size: 1.2em;
   }
 
+  .quebra h4 {
+    white-space: pre-wrap
+  }
+
   .availability-value, .resource-value, .count {
     font-size: 1.5em;
   }
