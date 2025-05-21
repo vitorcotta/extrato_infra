@@ -46,7 +46,7 @@ const config = {
       // Preencher cabeçalho
       document.getElementById('headerInfo').innerHTML = `
         <h2>${data.division}</h2>
-       
+        <h3>Mês: ${data.month}</h3>
       `;
       
       // Disponibilidade
