@@ -264,7 +264,7 @@ const config = {
   
           lista.forEach(proj => {
             const div = document.createElement('div');
-            div.className = 'resource-metric';
+            div.className = 'card-green resource-metric';
             div.innerHTML = `
               <h4>${proj.name}</h4>
               <p class="investment">Solicitante: ${proj.areaSolicitante}</p>
