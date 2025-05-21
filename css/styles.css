@@ -388,7 +388,7 @@ th {
   }
 
   .quebra {
-    white-space: pre-wrap
+    white-space: pre-wrap;
   }
 
   .availability-value, .resource-value, .count {
