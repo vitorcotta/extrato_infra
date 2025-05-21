@@ -1,0 +1,300 @@
+/* Estilos globais */
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+  }
+  
+  .dashboard {
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ebebeb;
+    color: black;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+  }
+  
+  .header img {
+    height: 50px;
+  }
+  
+  .header h1 {
+    margin: 0;
+    font-size: 1.5em;
+    white-space: nowrap;
+  }
+  
+  .card {
+    background: white;
+    border-radius: 8px;
+    padding: 10px 20px;
+    margin-top: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .icon {
+    margin-right: 10px;
+    font-size: 1.2em;
+  }
+  
+  .variação {
+    font-size: 0.8em;
+    margin-left: 5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+  }
+  
+  .up {
+    color: green;
+  }
+  
+  .down {
+    color: red;
+  }
+  
+  .availability-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .availability-metric {
+    background: #2e7d32;
+    color: white;
+    padding: 0px;
+    border-radius: 8px;
+    text-align: center;
+    flex: 1;
+    min-width: 120px;
+  }
+  
+  .availability-value {
+    font-size: 2em;
+    font-weight: bold;
+    margin: 0;
+    padding-top: 0px;
+  }
+  
+  .metrics {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  
+  .metric {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-width: 120px;
+    border-left: 4px solid;
+  }
+  
+  .trend.up {
+    color: #2e7d32;
+  }
+  
+  .trend.up.main {
+    color: white;
+  }
+  
+  .trend.down {
+    color: #d32f2f;
+  }
+  
+  .project-metric {
+    flex: 1;
+    min-width: 120px;
+    padding: 15px;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-left: 4px solid transparent;
+  }
+  
+  .project-metric h4 {
+    margin: 0 0 10px 0;
+    font-size: 1.1em;
+  }
+  
+  .count {
+    font-size: 1.8em;
+    font-weight: bold;
+    margin: 5px 0;
+    text-align: center;
+  }
+  
+  .investment {
+    color: #666;
+    margin: 5px 0;
+    font-size: 0.9em;
+  }
+  
+  .resource-metric {
+    flex: 1;
+    min-width: 120px;
+    padding: 0px 15px;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-left: 4px solid;
+  }
+  
+  .text-blue {
+    color: #1976d2;
+    font-weight: bold;
+    font-size: 1.4em;
+    margin: 8px 0;
+  }
+  
+  .text-purple {
+    color: purple;
+    font-weight: bold;
+    font-size: 1.4em;
+    margin: 8px 0;
+  }
+  
+  .text-green {
+    color: green;
+    font-weight: bold;
+    font-size: 1.4em;
+    margin: 8px 0;
+  }
+  
+  .resource-value {
+    font-size: 1.8em;
+    font-weight: bold;
+    margin: 5px 0;
+  }
+  
+  .metric-card {
+    flex: 1;
+    min-width: 120px;
+    padding: 15px;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-left: 4px solid #2e7d32;
+  }
+  
+  .card-green {
+    border-color: #2e7d32;
+  }
+  
+  .card-blue {
+    border-color: #1976d2;
+  }
+  
+  .card-yellow {
+    border-color: #fbc02d;
+  }
+  
+  .card-red {
+    border-color: #d32f2f;
+  }
+  
+  .card-purple {
+    border-color: purple;
+  }
+  
+  /* Media Queries para Responsividade */
+  @media (max-width: 768px) {
+    .header {
+      flex-direction: column;
+      text-align: center;
+    }
+  
+    .header h1 {
+      margin-top: 10px;
+    }
+  
+    .availability-card, .metrics {
+      flex-direction: column;
+    }
+  
+    .availability-metric, .metric, .project-metric, .resource-metric {
+      width: 100%;
+      margin-bottom: 15px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .header h1 {
+      font-size: 1.2em;
+    }
+  
+    .availability-value, .resource-value, .count {
+      font-size: 1.5em;
+    }
+  
+    .text-blue, .text-purple, .text-green {
+      font-size: 1.2em;
+    }
+  }
+  
+  /* Top Bar (mantido do styles.css principal) */
+  .top-bar {
+    background-color: #333;
+    padding: 5px 0;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
+  }
+  
+  .top-bar a, .dropbtn {
+    color: white;
+    font-size: 12px;
+    text-decoration: none;
+    margin: 0 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #444;
+    min-width: 120px;
+    z-index: 1;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  
+  .dropdown-content a {
+    color: white;
+    padding: 8px 12px;
+    display: block;
+    text-align: left;
+    text-decoration: none;
+  }
+  
+  .dropdown-content a:hover {
+    background-color: #555;
+  }
+  
+  .dropdown:hover .dropdown-content {
+    display: block;
+  }

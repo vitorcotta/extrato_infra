@@ -4,72 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Disponibilidade Mensal por Sistema</title>
-  <style>
-    /* Mantive o mesmo estilo da página original */
-    .top-bar {
-      background-color: #333;
-      padding: 5px 0;
-      text-align: center;
-    }
-    
-    .top-bar a {
-      color: white;
-      font-size: 12px;
-      text-decoration: none;
-      margin: 0 10px;
-    }
-
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      overflow-x: auto; /* Permite scroll horizontal em telas pequenas */
-    }
-    
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    table {
-      border-collapse: collapse;
-      margin: 20px auto;
-      min-width: 1000px; /* Largura mínima para manter legibilidade */
-    }
-
-    th, td {
-      padding: 8px;
-      border: 1px solid #ddd;
-      text-align: center;
-      min-width: 80px; /* Largura mínima para as células dos meses */
-    }
-
-    th {
-      background-color: #f4f4f4;
-      position: sticky;
-      left: 0;
-    }
-
-    /* Cores consistentes com a tabela original */
-    .ok { background-color: #02b902; color: white; }
-    .degradado { background-color: #fb632c; color: white; }
-    .indisponivel { background-color: #fb2c39; color: white; }
-
-    /* Container para scroll */
-    .table-container {
-      max-width: 100%;
-      overflow-x: auto;
-    }
-  </style>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
   <nav class="top-bar">
     <a href="extrato.html">Extrato</a>
-    <a href="index.html">2025</a>
-    <a href="mesames.html">Mensal</a>
-</nav>
-  <h1>Disponibilidade Mensal por Sistema</h1>
+    <div class="dropdown">
+      <button class="dropbtn">Disponibilidade ▾</button>
+      <div class="dropdown-content">
+        <a href="index.html">Acumulada (Ano)</a>
+        <a href="mesames.html">Mês a mês</a>
+      </div>
+    </div>
+    <a href="projetos.html">Projetos</a>
+  </nav>
+  
+  <h1 style="text-align: center;">Disponibilidade Mensal por Sistema</h1>
   
   <div class="table-container">
+    
     <table id="disponibilidadeTable">
       <thead>
         <tr>
@@ -94,46 +47,29 @@
     </table>
   </div>
 
-  <script>
-    // Função para carregar e exibir os dados
-    async function loadData() {
-      try {
-        const response = await fetch('dispm2m.json');
-        const data = await response.json();
-        const tbody = document.querySelector('#disponibilidadeTable tbody');
+  <script src="js/main.js"></script>
 
-        data.forEach(item => {
-          const row = document.createElement('tr');
-          
-          // Adiciona classes de status com base na disponibilidade
-          const getStatusClass = (value) => {
-            if (!value) return '';
-            const num = parseFloat(value);
-            if (num >= 99.9) return 'ok';
-            if (num < 99.9) return 'indisponivel';
-            return 'indisponivel';
-          };
+  <!-- Timeline Sidebar -->
+<div id="timelineSidebar" class="sidebar timeline-sidebar">
+  <div class="sidebar-header">
+    <h2 id="timelineTitle">Timeline</h2>
+    <button class="close-btn" onclick="sidebar.close('timelineSidebar');sidebar.close('detailsSidebar')">×</button>
+  </div>
+  <ul id="timelineContent">
+    <!-- Timeline será carregada aqui -->
+  </ul>
+</div>
 
-          row.innerHTML = `
+<!-- Event Details Sidebar -->
+<div id="detailsSidebar" class="sidebar details-sidebar">
+  <div class="sidebar-header">
+    <h2>Detalhes do Evento</h2>
+    <button class="close-btn" onclick="sidebar.close('detailsSidebar')">×</button>
+  </div>
+  <div id="eventDetails">
+    <!-- Detalhes do evento serão carregados aqui -->
+  </div>
+</div>
 
-            <td>${item.sistema}</td>
-            ${['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'].map(month => `
-              <td class="${getStatusClass(item[month])}">
-                ${item[month] || 'N/A'}${item[month] ? '%' : ''}
-              </td>
-            `).join('')}
-          `;
-
-          tbody.appendChild(row);
-        });
-
-      } catch (error) {
-        console.error('Erro ao carregar dados:', error);
-      }
-    }
-
-    // Inicia o carregamento
-    loadData();
-  </script>
 </body>
 </html>
