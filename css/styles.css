@@ -399,3 +399,7 @@ th {
     font-size: 1.2em;
   }
 }
+
+#eventDetails {
+  margin: 25px;
+}
