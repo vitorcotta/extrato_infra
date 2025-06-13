@@ -553,7 +553,7 @@ const sidebar = {
     const contorno = event.Contorno ? utils.convertExcelDate(event.Contorno) : null;
 
     eventDetails.innerHTML = `
-      <p><strong>ID:</strong> ${event.id}</p>
+      <p><strong>ID:</strong> ${event.ID}</p>
       <p><strong>Sistema:</strong> ${event.Sistema}</p>
       <p><strong>Tipo:</strong> ${event.Tipo}</p>
       <p><strong>Início:</strong> ${utils.formatDate(inicio)}</p>
