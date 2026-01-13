@@ -340,7 +340,7 @@ const monthlyPage = {
 
         row.innerHTML = `
           <td class="sistema-cell" data-sistema="${item.sistema}">${item.sistema}</td>
-          ${['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'].map(month => `
+          ${['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez','Jan/26'].map(month => `
             <td class="${getStatusClass(item[month])}">
               ${item[month] || 'N/A'}${item[month] ? '%' : ''}
             </td>
