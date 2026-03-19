@@ -367,17 +367,28 @@ const monthlyPage = {
         return new Date(year, month, 1);
       };
 
-      const ignoredKeys = new Set(['sistema', 'sistema', 'Sistema', 'id', 'ID']);
-      const monthKeys = Array.from(new Set(Object.keys(data[0]).filter(k => !ignoredKeys.has(k))));
-      const monthEntries = monthKeys
+      const ignoredKeys = new Set(['sistema', 'Sistema', 'id', 'ID']);
+      const allKeys = Object.keys(data[0]).filter(k => !ignoredKeys.has(k));
+      const monthEntries = allKeys
         .map(key => ({ key, date: getMonthFromKey(key) }))
         .filter(entry => entry.date)
         .sort((a, b) => a.date - b.date);
 
-      const last12MonthEntries = monthEntries.slice(-12);
+      let last12MonthEntries;
+      if (monthEntries.length >= 1) {
+        last12MonthEntries = monthEntries.slice(-12);
+      } else {
+        // fallback: preserve key order (excluding sistema) when keys are not recognized as month labels
+        last12MonthEntries = allKeys.slice(0, 12).map(key => ({ key, date: null }));
+      }
 
       headerRow.innerHTML = '<th>Sistema</th>' + last12MonthEntries
-        .map(m => `<th>${m.date.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }).replace('.', '')}</th>`)
+        .map(m => {
+          if (m.date) {
+            return `<th>${m.date.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }).replace('.', '')}</th>`;
+          }
+          return `<th>${m.key}</th>`;
+        })
         .join('');
 
       const getStatusClass = (value) => {
