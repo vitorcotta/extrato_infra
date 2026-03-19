@@ -326,27 +326,77 @@ const monthlyPage = {
       const response = await fetch(config.dataUrls.monthlyData);
       const data = await response.json();
       const tbody = document.querySelector('#disponibilidadeTable tbody');
-      tbody.innerHTML = '';
+      const headerRow = document.getElementById('disponibilidadeHeaderRow');
 
-      data.forEach(item => {
-        const row = document.createElement('tr');
-        
-        const getStatusClass = (value) => {
-          if (!value) return '';
-          const num = parseFloat(value);
-          if (num >= config.availabilityThreshold) return 'ok';
-          return 'indisponivel';
+      if (!Array.isArray(data) || data.length === 0) {
+        headerRow.innerHTML = '<th>Sistema</th>';
+        tbody.innerHTML = '<tr><td colspan="13">Sem dados disponíveis</td></tr>';
+        return;
+      }
+
+      const getMonthFromKey = (key) => {
+        const monthMap = {
+          jan: 0, fev: 1, mar: 2, abr: 3, mai: 4, jun: 5,
+          jul: 6, ago: 7, set: 8, out: 9, nov: 10, dez: 11,
+          january: 0, february: 1, march: 2, april: 3, may: 4, june: 5,
+          july: 6, august: 7, september: 8, october: 9, november: 10, december: 11
         };
 
-        row.innerHTML = `
-          <td class="sistema-cell" data-sistema="${item.sistema}">${item.sistema}</td>
-          ${['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez','Jan/26'].map(month => `
-            <td class="${getStatusClass(item[month])}">
-              ${item[month] || 'N/A'}${item[month] ? '%' : ''}
-            </td>
-          `).join('')}
-        `;
+        const normalized = key.toLowerCase().trim();
+        const slashParts = normalized.split('/');
+        let monthLabel = slashParts[0];
+        let year = null;
 
+        if (slashParts.length === 2) {
+          year = parseInt(slashParts[1].length === 2 ? `20${slashParts[1]}` : slashParts[1], 10);
+        }
+
+        if (monthMap[monthLabel] === undefined) {
+          monthLabel = monthLabel.slice(0, 3);
+        }
+
+        if (monthMap[monthLabel] === undefined) return null;
+
+        const month = monthMap[monthLabel];
+        if (!year) {
+          const now = new Date();
+          year = now.getFullYear();
+          if (month > now.getMonth()) year -= 1;
+        }
+
+        return new Date(year, month, 1);
+      };
+
+      const ignoredKeys = new Set(['sistema', 'sistema', 'Sistema', 'id', 'ID']);
+      const monthKeys = Array.from(new Set(Object.keys(data[0]).filter(k => !ignoredKeys.has(k))));
+      const monthEntries = monthKeys
+        .map(key => ({ key, date: getMonthFromKey(key) }))
+        .filter(entry => entry.date)
+        .sort((a, b) => a.date - b.date);
+
+      const last12MonthEntries = monthEntries.slice(-12);
+
+      headerRow.innerHTML = '<th>Sistema</th>' + last12MonthEntries
+        .map(m => `<th>${m.date.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }).replace('.', '')}</th>`)
+        .join('');
+
+      const getStatusClass = (value) => {
+        if (value === null || value === undefined || value === '') return '';
+        const num = parseFloat(value);
+        if (Number.isNaN(num)) return '';
+        return num >= config.availabilityThreshold ? 'ok' : 'indisponivel';
+      };
+
+      tbody.innerHTML = '';
+      data.forEach(item => {
+        const row = document.createElement('tr');
+        const cells = last12MonthEntries.map(m => {
+          const value = item[m.key];
+          const formatted = (value === null || value === undefined || value === '') ? 'N/A' : `${value}%`;
+          return `<td class="${getStatusClass(value)}">${formatted}</td>`;
+        }).join('');
+
+        row.innerHTML = `<td class="sistema-cell" data-sistema="${item.sistema || item.Sistema || ''}">${item.sistema || item.Sistema || 'Sem Nome'}</td>${cells}`;
         tbody.appendChild(row);
       });
     } catch (error) {
@@ -355,11 +405,13 @@ const monthlyPage = {
   },
 
   setupEventListeners: () => {
-    document.querySelectorAll('#disponibilidadeTable .sistema-cell').forEach(cell => {
-      cell.addEventListener('click', (e) => {
-        const sistema = e.target.getAttribute('data-sistema');
-        monthlyPage.showTimeline(sistema);
-      });
+    const tbody = document.querySelector('#disponibilidadeTable tbody');
+    tbody.addEventListener('click', (e) => {
+      const cell = e.target.closest('.sistema-cell');
+      if (!cell) return;
+      const sistema = cell.getAttribute('data-sistema');
+      if (!sistema) return;
+      monthlyPage.showTimeline(sistema);
     });
   },
 
