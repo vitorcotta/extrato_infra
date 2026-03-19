@@ -369,23 +369,37 @@ const monthlyPage = {
 
       const ignoredKeys = new Set(['sistema', 'Sistema', 'id', 'ID']);
       const allKeys = Object.keys(data[0]).filter(k => !ignoredKeys.has(k));
-      const monthEntries = allKeys
-        .map(key => ({ key, date: getMonthFromKey(key) }))
-        .filter(entry => entry.date)
-        .sort((a, b) => a.date - b.date);
 
+      const monthByDate = new Map();
+      allKeys.forEach(key => {
+        const date = getMonthFromKey(key);
+        if (!date) return;
+        const monthId = `${date.getFullYear()}-${date.getMonth()}`;
+
+        const existing = monthByDate.get(monthId);
+        if (!existing) {
+          monthByDate.set(monthId, { key, date });
+        } else {
+          // prefer explicit year in key when present (e.g. Jan/26 vs Jan)
+          if (key.includes('/') && !existing.key.includes('/')) {
+            monthByDate.set(monthId, { key, date });
+          }
+        }
+      });
+
+      const monthEntries = Array.from(monthByDate.values()).sort((a, b) => a.date - b.date);
       let last12MonthEntries;
-      if (monthEntries.length >= 1) {
+      if (monthEntries.length > 0) {
         last12MonthEntries = monthEntries.slice(-12);
       } else {
-        // fallback: preserve key order (excluding sistema) when keys are not recognized as month labels
         last12MonthEntries = allKeys.slice(0, 12).map(key => ({ key, date: null }));
       }
 
       headerRow.innerHTML = '<th>Sistema</th>' + last12MonthEntries
         .map(m => {
           if (m.date) {
-            return `<th>${m.date.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }).replace('.', '')}</th>`;
+            const label = m.date.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }).replace('.', '');
+            return `<th>${label}</th>`;
           }
           return `<th>${m.key}</th>`;
         })
